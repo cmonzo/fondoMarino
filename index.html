@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>¡El Proyecto del Mar! 🐬</title>
+<style>
+        /* CSS: Estilos de la página y cursor de delfín */
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+        
+        /* Cursor personalizado con el emoji del delfín en toda la web */
+        body, button, .bubble, html, .flip-stage, input {
+            cursor: url("delfin-cursor.png") 8 8, pointer !important;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #114e7a, #041a31);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(25, 84, 123, 0.4);
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.2rem;
+            color: #4ef0ff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .container {
+            max-width: 900px;
+            width: 95%;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Ficha didáctica */
+        .info-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .info-card h2 {
+            color: #4ef0ff;
+            margin-top: 0;
+            border-bottom: 2px solid rgba(78, 240, 255, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .info-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-list li {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .info-list li::before {
+            content: "🌊";
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        /* Zona de Juego */
+        .game-card {
+            background: rgba(10, 45, 78, 0.6);
+            border-radius: 20px;
+            border: 2px solid #4ef0ff;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            min-height: 400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-card h2 {
+            margin-top: 0;
+            color: #ffca28;
+            text-align: center;
+        }
+
+        .ocean-area {
+            width: 100%;
+            height: 320px;
+            background: radial-gradient(circle at center, #1b6ca8, #093154);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        /* La burbuja mágica única */
+        .bubble {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9), rgba(0, 162, 255, 0.6));
+            box-shadow: inset -5px -5px 15px rgba(0,0,0,0.3), 0 0 15px rgba(255,255,255,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #031326;
+            transition: all 0.2s ease-out;
+            user-select: none;
+        }
+
+        /* Pantalla de Ganador */
+        .victory-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(4, 26, 49, 0.95);
+            border-radius: 15px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        .victory-title {
+            font-size: 2.2rem;
+            color: #ffca28;
+            margin-bottom: 10px;
+        }
+
+        .restart-btn {
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 25px;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+        }
+
+        .music-controls { width:min(900px,95%); padding:15px; margin:15px auto 0; border-radius:15px; background:rgba(255,255,255,.12); display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+        .music-controls input { flex:1 1 260px; min-width:0; padding:12px; border-radius:8px; border:0; user-select:text; }
+        .music-controls button { padding:12px 18px; background:#ffca28; color:#06223b; border:0; border-radius:10px; font-weight:bold; cursor:pointer; }
+        .music-controls small { width:100%; color:#c9e9ff; }
+        .bubble { cursor:pointer; touch-action:manipulation; }
+        /* Audio local: sin YouTube ni conexión a Internet */
+        #musicaLocal { display:none; }
+
+
+        /* Acuario animado cinematográfico con variedad de peces, siempre detrás del contenido */
+        .aquarium {position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 55% -10%,rgba(67,205,237,.20),transparent 65%)}
+        .aquarium::before {content:"";position:absolute;inset:0;background:repeating-linear-gradient(105deg,transparent 0 140px,rgba(153,238,255,.045) 180px,transparent 230px);opacity:.65}
+        body>header,body>.container,body>.music-controls {position:relative;z-index:1}
+        .sea-creature {position:absolute;left:-180px;top:var(--y);font-size:var(--size);opacity:var(--opacity,.75);filter:drop-shadow(0 5px 7px rgba(0,18,48,.4));animation:swim var(--duration) linear infinite;animation-delay:var(--delay);will-change:transform}
+        .sea-creature.reverse {left:auto;right:-180px;animation-name:swim-reverse;transform:scaleX(-1)}
+        .sea-creature.dolphin {width:var(--size);height:auto}
+        .sea-creature.dolphin svg {display:block;width:100%;height:auto;animation:dolphin-bob 3.6s ease-in-out infinite}
+        .sea-creature.fish {animation-timing-function:linear}
+        .air-bubble {position:absolute;bottom:-30px;left:var(--x);width:var(--r);height:var(--r);border:1px solid rgba(195,245,255,.55);border-radius:50%;box-shadow:inset 3px 3px 7px rgba(215,249,255,.24);animation:rise var(--duration) linear infinite;animation-delay:var(--delay)}
+        @keyframes swim {from{transform:translateX(-10vw) translateY(0)} 50%{transform:translateX(60vw) translateY(-22px)}to{transform:translateX(125vw) translateY(5px)}}
+        @keyframes swim-reverse {from{transform:scaleX(-1) translateX(-10vw)}50%{transform:scaleX(-1) translateX(60vw) translateY(16px)}to{transform:scaleX(-1) translateX(125vw)}}
+        @keyframes dolphin-bob {0%,100%{transform:rotate(-5deg) translateY(0)}50%{transform:rotate(4deg) translateY(-12px)}}
+        @keyframes rise {from{transform:translateY(0) translateX(0);opacity:0}15%{opacity:.7}85%{opacity:.5}to{transform:translateY(-110vh) translateX(35px);opacity:0}}
+        @media(prefers-reduced-motion:reduce){.sea-creature,.sea-creature.dolphin svg,.air-bubble{animation:none!important}}
+
+        /* Tarjetas didácticas con ampliación y giro 3D */
+        .discovery-section { min-width:0; }
+        .discovery-hint { color:#c9f5ff; line-height:1.4; margin:0 0 15px; }
+        .fact-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+        .fact-tile { display:flex; flex-direction:column; gap:5px; align-items:stretch; border:1px solid #75d8f5; border-radius:15px; background:#0b456a; color:white; padding:7px; text-align:center; overflow:hidden; cursor:pointer; transition:transform .2s,box-shadow .2s; font:inherit; }
+        .fact-tile:hover,.fact-tile:focus-visible { transform:translateY(-3px);box-shadow:0 0 16px #51cfff88;outline:2px solid #a4f4ff; }
+        .fact-tile .scene-svg { display:block;width:100%;aspect-ratio:260/180; }
+        .fact-tile span {font-size:.94rem;font-weight:800;line-height:1.25;}
+        .fact-tile small {color:#b9efff;font-size:.76rem;}
+        .fact-overlay[hidden] {display:none!important;}
+        .fact-overlay {position:fixed;inset:0;z-index:1000;background:rgba(1,15,32,.82);display:grid;place-items:center;padding:18px;backdrop-filter:blur(7px);}
+        .fact-dialog {position:relative;width:min(92vw,540px);}
+        .fact-close {position:absolute;right:0;top:-50px;border:2px solid #a6f1ff;background:#123f60;color:white;border-radius:50%;width:42px;height:42px;font-size:1.4rem;cursor:pointer;z-index:2;}
+        .flip-stage {perspective:1200px;width:100%;height:min(65vh,400px);min-height:290px;cursor:pointer;}
+        .flip-inner {width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .75s cubic-bezier(.2,.7,.2,1);}
+        .flip-inner.is-flipped {transform:rotateY(180deg);}
+        .flip-face {position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:3px solid #8ee9ff;border-radius:22px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 16px 55px #0008;}
+        .flip-front {background:#085078;}
+        .flip-front .scene-svg {height:100%;width:100%;object-fit:cover;}
+        .flip-back {transform:rotateY(180deg);background:linear-gradient(150deg,#176c9c,#073454);text-align:center;padding:24px;gap:12px;}
+        .flip-back h2 {font-size:clamp(1.35rem,4vw,2rem);color:#ffdf7c;margin:0;}
+        .flip-back p {font-size:clamp(1rem,2.5vw,1.25rem);line-height:1.55;margin:0;}
+        .fact-back-icon {font-size:2.6rem;}
+        .flip-instruction,.dialog-hint {font-size:.83rem;color:#bce9f8;text-align:center;}
+        .dialog-hint {margin:12px 0 0;}
+        @media(max-width:430px){.fact-grid{gap:8px}.fact-tile{padding:5px}.fact-tile span{font-size:.8rem}.flip-stage{height:340px}}
+        @media(prefers-reduced-motion:reduce){.flip-inner{transition:none}}
+
+
+        /* Segundo juego: letras perdidas */
+        .letter-game { grid-column: 1 / -1; background:rgba(10,45,78,.85);border:2px solid #4ef0ff;border-radius:20px;padding:24px;text-align:center;box-shadow:0 8px 32px #0005; }
+        .letter-game h2{color:#ffca28;margin:0 0 10px} .letter-game p{color:#c5efff}
+        .letter-word{font-size:clamp(2.6rem,9vw,5rem);font-weight:900;letter-spacing:.14em;margin:18px auto;color:#fff;text-shadow:0 3px 12px #001b33;}
+        .missing-letter{color:#ffca28;border-bottom:5px solid #ffca28;padding:0 .1em}
+        .letter-options{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:15px 0}
+        .letter-choice{width:72px;height:72px;border:3px solid #a9f7ff;border-radius:18px;background:#1476a8;color:white;font-size:2.5rem;font-weight:800;cursor:pointer;transition:transform .15s,background .15s}
+        .letter-choice:hover,.letter-choice:focus-visible{transform:scale(1.1);background:#1ba9bd}
+        .letter-choice:disabled{opacity:.65;cursor:default}
+        .letter-feedback{min-height:52px;font-size:1.6rem;font-weight:800;padding:10px;color:#fff}
+        .letter-feedback.correct{color:#9bffb6}.letter-feedback.incorrect{color:#ffe69a}
+        .letter-reset{background:#ff9800;color:#fff;border:0;border-radius:24px;padding:12px 26px;font-size:1.1rem;font-weight:800;cursor:pointer}
+        
+
+/* Ficha de los delfines: mismo ancho que los juegos y tarjetas grandes */
+.discovery-section{grid-column:1 / -1;width:100%;padding:clamp(18px,3vw,32px)}
+.discovery-section h2{font-size:clamp(1.6rem,3vw,2.3rem)}
+.discovery-hint{font-size:clamp(1rem,1.7vw,1.2rem);margin-bottom:22px}
+.discovery-section .fact-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,2vw,22px)}
+.discovery-section .fact-tile{padding:clamp(10px,1.6vw,18px);border-radius:20px;gap:10px}
+.discovery-section .fact-tile .scene-svg{width:100%;aspect-ratio:260/180;max-height:300px;border-radius:12px}
+.discovery-section .fact-tile span{font-size:clamp(1.1rem,2.2vw,1.6rem)}
+.discovery-section .fact-tile small{font-size:clamp(.9rem,1.4vw,1.05rem)}
+@media(max-width:540px){.discovery-section .fact-grid{gap:10px}.discovery-section .fact-tile{padding:8px;gap:6px}.discovery-section .fact-tile span{font-size:clamp(.95rem,3.7vw,1.2rem)}.discovery-section .fact-tile small{font-size:.8rem}}
+
+/* Juego de contar más grande y legible */
+.game-card{grid-column:1 / -1;min-height:550px;padding:26px}
+.game-card h2{font-size:clamp(1.6rem,3vw,2.3rem)}
+.ocean-area{height:clamp(370px,52vw,490px)}
+.bubble{width:105px;height:105px;font-size:3rem;cursor:pointer}
+.victory-title{font-size:clamp(1.7rem,5vw,3rem)}
+/* Juego de animales marinos con tarjetas giratorias */
+.animal-game{grid-column:1 / -1;background:rgba(10,45,78,.88);border:2px solid #4ef0ff;border-radius:20px;padding:24px;box-shadow:0 8px 32px #0005;text-align:center}
+.animal-game h2{color:#ffca28;margin:0 0 8px;font-size:clamp(1.5rem,3vw,2rem)}
+.animal-game>p{color:#c5efff;margin:0 0 20px}
+.animal-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.animal-card{border:0;background:none;padding:0;cursor:pointer;perspective:900px;min-width:0;aspect-ratio:4/3;color:#fff;font:inherit}
+.animal-card-inner{display:block;position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.2,.75,.2,1)}
+.animal-card.flipped .animal-card-inner{transform:rotateY(180deg)}
+.animal-face{display:flex;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;border:2px solid #91e9ff;border-radius:20px;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 8px 22px #001b34a6;overflow:hidden}
+.animal-photo{width:100%;height:100%;object-fit:cover;display:block}.animal-front .animal-hint{position:absolute;bottom:9px;left:50%;transform:translateX(-50%);background:#003b63d9;border-radius:18px;padding:5px 14px;margin:0;white-space:nowrap;font-weight:700}.animal-front{background:radial-gradient(circle at 30% 15%,#318cba,#064368)}
+.animal-back{transform:rotateY(180deg);background:linear-gradient(135deg,#176a9c,#063456);padding:10px}
+.animal-emoji{display:block;font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif;font-size:clamp(3.7rem,10vw,7rem);line-height:1.1;filter:drop-shadow(0 7px 5px #00344c88)}
+.animal-hint{font-size:.86rem;color:#d2f8ff;margin-top:10px}
+.animal-name{font-size:clamp(1.15rem,2.6vw,2rem);font-weight:900;color:#ffdf83;line-height:1.15;overflow-wrap:anywhere}
+.animal-back-emoji{display:block;font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif;font-size:clamp(2rem,5vw,3.5rem);margin-bottom:8px}
+.animal-card:focus-visible{outline:4px solid #ffdf83;outline-offset:4px;border-radius:20px}
+.animal-reset{margin-top:20px;background:#ff9800;color:#fff;border:0;border-radius:24px;padding:12px 25px;font-size:1.05rem;font-weight:800;cursor:pointer}
+@media(max-width:620px){.animal-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.animal-game{padding:15px}.animal-card{aspect-ratio:4/4.4}.animal-emoji{display:block;font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif;font-size:4.2rem}.game-card{padding:14px}.ocean-area{height:380px}}
+@media(prefers-reduced-motion:reduce){.animal-card-inner{transition:none}}
+
+    
+/* Selector de animales para el juego de letras */
+.letter-animal-picker{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:20px 0}
+.letter-pick{border:2px solid #8cecff;border-radius:17px;background:#06466c;padding:7px;cursor:pointer;color:white;font-weight:800;font-size:1rem;transition:transform .2s,box-shadow .2s}
+.letter-pick:hover,.letter-pick:focus-visible{transform:translateY(-4px);box-shadow:0 0 18px #4ef0ff88}
+.letter-pick img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:11px;margin-bottom:8px}
+.letter-selected{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:14px;margin:16px 0;color:#ffdf83}
+.letter-selected[hidden],.letter-animal-picker[hidden],.letter-word[hidden],.letter-options[hidden],.letter-reset[hidden]{display:none!important}
+.letter-selected img{width:100px;height:78px;object-fit:cover;border-radius:12px;border:2px solid #8cecff}
+#letterBack{border:0;border-radius:18px;background:#2074a0;color:white;padding:10px 16px;font-weight:700;cursor:pointer}
+@media(max-width:550px){.letter-animal-picker{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.letter-pick{font-size:.9rem}}
+</style>
+</head>
+<body>
+<div aria-hidden="true" class="aquarium" id="aquarium"></div>
+<header>
+<h1>🐬 ¡Proyecto del Mar: El Delfín! 🌊</h1>
+<p style="margin: 5px 0 0 0; color: #a1e9ff;">Sube tus altavoces para escuchar "Bajo el Mar" 🎵</p>
+</header>
+<!-- Guarda musica.mp3 junto a este archivo HTML -->
+<audio id="musicaLocal" loop="" preload="none">
+<source src="musica.mp3" type="audio/mpeg"/>
+</audio>
+<div class="music-controls">
+<span>🎶 Música de fondo: «Bajo el mar»</span>
+<button id="musicBtn" type="button">▶️ Activar música</button>
+<label for="musicVolume">🔊 Volumen</label>
+<input aria-label="Volumen de música" id="musicVolume" max="100" min="0" style="flex:0 1 130px;min-width:100px" type="range" value="65"/>
+<small id="musicStatus" role="status">Coloca un archivo llamado <strong>musica.mp3</strong> en la misma carpeta que este HTML. Después pulsa Activar música.</small>
+</div>
+<div class="container">
+<!-- Cuatro tarjetas educativas: toca una para ampliarla y girarla -->
+<section aria-labelledby="discover-title" class="info-card discovery-section">
+<h2 id="discover-title">¿Cómo son los delfines?</h2>
+<p class="discovery-hint">🐬 ¡Toca cada imagen para descubrir sus secretos!</p>
+<div class="fact-grid">
+<button aria-label="Descubrir: ¿Son peces?" class="fact-tile" data-fact="0" type="button"><svg aria-label="Ilustración de delfines" class="scene-svg" role="img" viewbox="0 0 260 180"><defs><lineargradient id="sea-breath" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#53c6ea"></stop><stop offset="1" stop-color="#07527f"></stop></lineargradient></defs><rect fill="url(#sea-breath)" height="180" rx="18" width="260"></rect><circle cx="34" cy="42" fill="#c9f9ff" opacity=".7" r="4"></circle><circle cx="55" cy="23" fill="none" opacity=".6" r="8" stroke="#b4f5ff"></circle><g transform="translate(6 18) scale(.95)"><g class="dolphin-drawing"><path d="M18 75 Q46 32 109 42 L132 14 142 48 Q177 51 206 74 L240 66 218 88 240 106 204 98 Q168 122 111 105 L83 140 84 100 Q43 112 18 75Z" fill="#8ed6eb" stroke="#d7f7ff" stroke-width="3"></path><path d="M75 97 Q136 122 201 84 Q164 106 117 91Z" fill="#e4f9ff"></path><path d="M122 102 L112 146 149 108" fill="#50a3c9"></path><circle cx="185" cy="71" fill="#123b64" r="4"></circle><path d="M204 85 Q212 92 220 85" fill="none" stroke="#286b91" stroke-linecap="round" stroke-width="3"></path></g></g><path d="M0 160 Q60 141 120 160 T260 160 V200 H0Z" fill="#38a7d0" opacity=".55"></path><g fill="#e5faff"><circle cx="191" cy="29" r="5"></circle><circle cx="199" cy="17" r="3"></circle><circle cx="205" cy="7" r="2"></circle></g></svg><span>¿Son peces?</span><small>¡Descúbrelo! ↗</small></button>
+<button aria-label="Descubrir: ¿Cómo duermen?" class="fact-tile" data-fact="1" type="button"><svg aria-label="Ilustración de delfines" class="scene-svg" role="img" viewbox="0 0 260 180"><defs><lineargradient id="sea-sleep" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#53c6ea"></stop><stop offset="1" stop-color="#07527f"></stop></lineargradient></defs><rect fill="url(#sea-sleep)" height="180" rx="18" width="260"></rect><circle cx="34" cy="42" fill="#c9f9ff" opacity=".7" r="4"></circle><circle cx="55" cy="23" fill="none" opacity=".6" r="8" stroke="#b4f5ff"></circle><g transform="translate(6 18) scale(.95)"><g class="dolphin-drawing"><path d="M18 75 Q46 32 109 42 L132 14 142 48 Q177 51 206 74 L240 66 218 88 240 106 204 98 Q168 122 111 105 L83 140 84 100 Q43 112 18 75Z" fill="#8ed6eb" stroke="#d7f7ff" stroke-width="3"></path><path d="M75 97 Q136 122 201 84 Q164 106 117 91Z" fill="#e4f9ff"></path><path d="M122 102 L112 146 149 108" fill="#50a3c9"></path><circle cx="185" cy="71" fill="#123b64" r="4"></circle><path d="M204 85 Q212 92 220 85" fill="none" stroke="#286b91" stroke-linecap="round" stroke-width="3"></path></g></g><g fill="#ffedab" font-family="sans-serif" font-weight="bold"><text font-size="30" x="200" y="38">Z</text><text font-size="19" x="223" y="21">z</text></g><circle cx="35" cy="33" fill="#fff2a0" opacity=".75" r="20"></circle></svg><span>¿Cómo duermen?</span><small>¡Descúbrelo! ↗</small></button>
+<button aria-label="Descubrir: ¿Viven en familia?" class="fact-tile" data-fact="2" type="button"><svg aria-label="Ilustración de delfines" class="scene-svg" role="img" viewbox="0 0 260 180"><defs><lineargradient id="sea-family" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#53c6ea"></stop><stop offset="1" stop-color="#07527f"></stop></lineargradient></defs><rect fill="url(#sea-family)" height="180" rx="18" width="260"></rect><circle cx="34" cy="42" fill="#c9f9ff" opacity=".7" r="4"></circle><circle cx="55" cy="23" fill="none" opacity=".6" r="8" stroke="#b4f5ff"></circle><g transform="translate(6 18) scale(.95)"><g class="dolphin-drawing"><path d="M18 75 Q46 32 109 42 L132 14 142 48 Q177 51 206 74 L240 66 218 88 240 106 204 98 Q168 122 111 105 L83 140 84 100 Q43 112 18 75Z" fill="#8ed6eb" stroke="#d7f7ff" stroke-width="3"></path><path d="M75 97 Q136 122 201 84 Q164 106 117 91Z" fill="#e4f9ff"></path><path d="M122 102 L112 146 149 108" fill="#50a3c9"></path><circle cx="185" cy="71" fill="#123b64" r="4"></circle><path d="M204 85 Q212 92 220 85" fill="none" stroke="#286b91" stroke-linecap="round" stroke-width="3"></path></g></g><g transform="translate(124 78) scale(.48) rotate(-12)"><g class="dolphin-drawing"><path d="M18 75 Q46 32 109 42 L132 14 142 48 Q177 51 206 74 L240 66 218 88 240 106 204 98 Q168 122 111 105 L83 140 84 100 Q43 112 18 75Z" fill="#8ed6eb" stroke="#d7f7ff" stroke-width="3"></path><path d="M75 97 Q136 122 201 84 Q164 106 117 91Z" fill="#e4f9ff"></path><path d="M122 102 L112 146 149 108" fill="#50a3c9"></path><circle cx="185" cy="71" fill="#123b64" r="4"></circle><path d="M204 85 Q212 92 220 85" fill="none" stroke="#286b91" stroke-linecap="round" stroke-width="3"></path></g></g><g transform="translate(-12 95) scale(.38) rotate(12)"><g class="dolphin-drawing"><path d="M18 75 Q46 32 109 42 L132 14 142 48 Q177 51 206 74 L240 66 218 88 240 106 204 98 Q168 122 111 105 L83 140 84 100 Q43 112 18 75Z" fill="#8ed6eb" stroke="#d7f7ff" stroke-width="3"></path><path d="M75 97 Q136 122 201 84 Q164 106 117 91Z" fill="#e4f9ff"></path><path d="M122 102 L112 146 149 108" fill="#50a3c9"></path><circle cx="185" cy="71" fill="#123b64" r="4"></circle><path d="M204 85 Q212 92 220 85" fill="none" stroke="#286b91" stroke-linecap="round" stroke-width="3"></path></g></g></svg><span>¿Viven en familia?</span><small>¡Descúbrelo! ↗</small></button>
+<button aria-label="Descubrir: ¿Cómo hablan?" class="fact-tile" data-fact="3" type="button"><svg aria-label="Ilustración de delfines" class="scene-svg" role="img" viewbox="0 0 260 180"><defs><lineargradient id="sea-talk" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#53c6ea"></stop><stop offset="1" stop-color="#07527f"></stop></lineargradient></defs><rect fill="url(#sea-talk)" height="180" rx="18" width="260"></rect><circle cx="34" cy="42" fill="#c9f9ff" opacity=".7" r="4"></circle><circle cx="55" cy="23" fill="none" opacity=".6" r="8" stroke="#b4f5ff"></circle><g transform="translate(6 18) scale(.95)"><g class="dolphin-drawing"><path d="M18 75 Q46 32 109 42 L132 14 142 48 Q177 51 206 74 L240 66 218 88 240 106 204 98 Q168 122 111 105 L83 140 84 100 Q43 112 18 75Z" fill="#8ed6eb" stroke="#d7f7ff" stroke-width="3"></path><path d="M75 97 Q136 122 201 84 Q164 106 117 91Z" fill="#e4f9ff"></path><path d="M122 102 L112 146 149 108" fill="#50a3c9"></path><circle cx="185" cy="71" fill="#123b64" r="4"></circle><path d="M204 85 Q212 92 220 85" fill="none" stroke="#286b91" stroke-linecap="round" stroke-width="3"></path></g></g><g transform="translate(250 168) scale(-.58 -.58)"><g class="dolphin-drawing"><path d="M18 75 Q46 32 109 42 L132 14 142 48 Q177 51 206 74 L240 66 218 88 240 106 204 98 Q168 122 111 105 L83 140 84 100 Q43 112 18 75Z" fill="#8ed6eb" stroke="#d7f7ff" stroke-width="3"></path><path d="M75 97 Q136 122 201 84 Q164 106 117 91Z" fill="#e4f9ff"></path><path d="M122 102 L112 146 149 108" fill="#50a3c9"></path><circle cx="185" cy="71" fill="#123b64" r="4"></circle><path d="M204 85 Q212 92 220 85" fill="none" stroke="#286b91" stroke-linecap="round" stroke-width="3"></path></g></g><g fill="none" opacity=".85" stroke="#bdf9ff" stroke-width="4"><path d="M195 35 Q217 51 196 67"></path><path d="M210 26 Q244 51 212 77"></path></g></svg><span>¿Cómo hablan?</span><small>¡Descúbrelo! ↗</small></button>
+</div>
+</section>
+<div class="fact-overlay" hidden="" id="factOverlay">
+<div aria-label="Descubre los delfines" aria-modal="true" class="fact-dialog" role="dialog">
+<button aria-label="Cerrar tarjeta" class="fact-close" id="factClose" type="button">✕</button>
+<div class="flip-stage" id="flipStage">
+<div class="flip-inner" id="flipInner">
+<div class="flip-face flip-front" id="flipFront"></div>
+<div class="flip-face flip-back"><div class="fact-back-icon">🐬</div><h2 id="factTitle"></h2><p id="factText"></p><span class="flip-instruction">Pulsa la tarjeta para volver a ver la imagen</span></div>
+</div>
+</div>
+<p class="dialog-hint">Pulsa la tarjeta para girarla · ✕ para cerrar</p>
+</div>
+</div>
+<!-- Derecha: Juego interactivo -->
+<div class="game-card">
+<h2>¡Ayuda al delfín a contar hasta 30!</h2>
+<p style="margin: 0 0 15px 0; text-align: center; color: #b0d4f1;">¡Toca la burbuja con el delfín para cambiar el número y moverla!</p>
+<div class="ocean-area" id="oceanArea">
+<!-- La burbuja mágica única -->
+<div class="bubble" id="gameBubble" style="left: 40%; top: 40%;">1</div>
+<!-- Pantalla de Victoria -->
+<div class="victory-screen" id="victoryScreen">
+<div class="victory-title">🎉 ¡MUY BIEN, HAS GANADO! 🎉</div>
+<p style="font-size: 1.3rem; margin: 5px 0;">¡Has contado del 1 al 30!</p>
+<div style="font-size: 3.5rem; margin: 15px 0;">🏴‍☠️🪙🎉🐬</div>
+<button class="restart-btn" id="restartBtn">¡Jugar otra vez! 🔄</button>
+</div>
+</div>
+</div>
+<section aria-labelledby="letterGameTitle" class="letter-game">
+<h2 id="letterGameTitle">🐬 ¡Encuentra la letra que falta!</h2>
+<p>¡Elige un animal marino y encuentra la letra que falta en su nombre!</p>
+<div aria-label="Elige un animal" class="letter-animal-picker" id="letterAnimalPicker"></div>
+<div class="letter-selected" hidden="" id="letterSelected"><img alt="" id="letterSelectedImage"/><strong id="letterSelectedTitle"></strong><button id="letterBack" type="button">↩ Elegir otro animal</button></div>
+<div aria-label="Delfín, con una letra oculta" class="letter-word" id="letterWord"></div>
+<div aria-label="Elige la letra correcta" class="letter-options" id="letterOptions"></div>
+<div aria-live="polite" class="letter-feedback" id="letterFeedback" role="status"></div>
+<button class="letter-reset" id="letterReset" type="button">🔄 Reiniciar juego</button>
+</section>
+<section aria-labelledby="animalGameTitle" class="animal-game">
+<h2 id="animalGameTitle">🐠 ¿Qué animal marino es?</h2>
+<p>¡Pulsa cada imagen para girar su tarjeta y descubrir cómo se llama!</p>
+<div class="animal-grid" id="animalGrid">
+<button aria-label="Descubrir nombre del delfín" aria-pressed="false" class="animal-card" type="button"><span class="animal-card-inner"><span class="animal-face animal-front"><img alt="Delfín" class="animal-photo" loading="lazy" src="imagenes/animal_1.webp"/><span class="animal-hint">¡Tócame!</span></span><span class="animal-face animal-back"><span aria-hidden="true" class="animal-back-emoji">🐬</span><span class="animal-name">DELFÍN</span></span></span></button>
+<button aria-label="Descubrir nombre del cangrejo" aria-pressed="false" class="animal-card" type="button"><span class="animal-card-inner"><span class="animal-face animal-front"><img alt="Cangrejo" class="animal-photo" loading="lazy" src="imagenes/animal_2.webp"/><span class="animal-hint">¡Tócame!</span></span><span class="animal-face animal-back"><span aria-hidden="true" class="animal-back-emoji">🦀</span><span class="animal-name">CANGREJO</span></span></span></button>
+<button aria-label="Descubrir nombre del tiburón" aria-pressed="false" class="animal-card" type="button"><span class="animal-card-inner"><span class="animal-face animal-front"><img alt="Tiburón" class="animal-photo" loading="lazy" src="imagenes/animal_3.webp"/><span class="animal-hint">¡Tócame!</span></span><span class="animal-face animal-back"><span aria-hidden="true" class="animal-back-emoji">🦈</span><span class="animal-name">TIBURÓN</span></span></span></button>
+<button aria-label="Descubrir nombre del caballito de mar" aria-pressed="false" class="animal-card" type="button"><span class="animal-card-inner"><span class="animal-face animal-front"><img alt="Caballito de mar" class="animal-photo" loading="lazy" src="imagenes/animal_4.webp"/><span class="animal-hint">¡Tócame!</span></span><span class="animal-face animal-back"><span aria-hidden="true" class="animal-back-emoji">🐴</span><span class="animal-name">CABALLITO DE MAR</span></span></span></button>
+<button aria-label="Descubrir nombre del pez espada" aria-pressed="false" class="animal-card" type="button"><span class="animal-card-inner"><span class="animal-face animal-front"><img alt="Pez espada" class="animal-photo" loading="lazy" src="imagenes/animal_5.webp"/><span class="animal-hint">¡Tócame!</span></span><span class="animal-face animal-back"><span aria-hidden="true" class="animal-back-emoji">🐟</span><span class="animal-name">PEZ ESPADA</span></span></span></button>
+<button aria-label="Descubrir nombre de la estrella de mar" aria-pressed="false" class="animal-card" type="button"><span class="animal-card-inner"><span class="animal-face animal-front"><img alt="Estrella de mar" class="animal-photo" loading="lazy" src="imagenes/animal_6.webp"/><span class="animal-hint">¡Tócame!</span></span><span class="animal-face animal-back"><span aria-hidden="true" class="animal-back-emoji">⭐</span><span class="animal-name">ESTRELLA DE MAR</span></span></span></button>
+<button aria-label="Descubrir nombre de la manta raya" aria-pressed="false" class="animal-card" type="button"><span class="animal-card-inner"><span class="animal-face animal-front"><img alt="Manta raya nadando bajo el mar" class="animal-photo" src="imagenes/animal_7.webp"/><span class="animal-hint">¡Toca para descubrir!</span></span><span class="animal-face animal-back"><span class="animal-name">MANTA RAYA</span></span></span></button></div>
+<button class="animal-reset" id="animalReset" type="button">🔄 Volver a empezar</button>
+</section>
+</div>
+<script>
+
+        // Peces de película de animación y delfines protagonistas.
+        // Todo se genera con HTML/SVG/CSS, sin vídeos ni dependencias externas.
+        (function createAquarium(){
+            const aquarium = document.getElementById('aquarium');
+            const dolphinSVG = `<svg viewBox="0 0 220 115" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="skin" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#a5e6f3"/><stop offset=".52" stop-color="#5bb6d2"/><stop offset="1" stop-color="#26799e"/></linearGradient></defs><path d="M31 58 3 28 17 65 3 91 37 73 Q71 104 135 78 Q170 69 185 57 L217 52 186 43 Q156 24 121 30 L100 7 91 35 Q58 38 31 58Z" fill="url(#skin)" stroke="#b8f3ff" stroke-width="2"/><path d="M77 80 Q123 97 174 57 Q143 70 109 70Z" fill="#d3f5f7" opacity=".8"/><path d="M113 72 97 110 137 77" fill="#368fb0"/><circle cx="164" cy="45" r="3.5" fill="#143b58"/><circle cx="165" cy="44" r="1" fill="white"/><path d="M191 55 Q199 61 207 54" stroke="#1b6587" stroke-width="2" fill="none"/></svg>`;
+            const creatures = [
+                ['dolphin', '13%', '155px', '24s', '-4s', false, '.85'],
+                ['dolphin', '68%', '110px', '32s', '-19s', true, '.70'],
+                ['dolphin', '43%', '85px', '40s', '-27s', false, '.48'],
+                ['dolphin', '83%', '120px', '35s', '-10s', true, '.56'],
+                ['fish', '9%', '52px', '24s', '-15s', true, '.88', '🐠'],
+                ['fish', '17%', '39px', '30s', '-8s', false, '.82', '🐟'],
+                ['fish', '24%', '48px', '26s', '-23s', false, '.88', '🐡'],
+                ['fish', '31%', '43px', '34s', '-30s', true, '.78', '🐠'],
+                ['fish', '39%', '34px', '28s', '-11s', false, '.8', '🐟'],
+                ['fish', '48%', '55px', '33s', '-18s', true, '.9', '🐠'],
+                ['fish', '55%', '38px', '23s', '-4s', false, '.85', '🐡'],
+                ['fish', '62%', '44px', '31s', '-25s', true, '.85', '🐟'],
+                ['fish', '71%', '56px', '29s', '-16s', false, '.86', '🐠'],
+                ['fish', '79%', '36px', '36s', '-28s', true, '.78', '🐟'],
+                ['fish', '87%', '48px', '27s', '-6s', false, '.82', '🐠'],
+                ['fish', '93%', '32px', '32s', '-20s', true, '.75', '🐡']
+            ];
+            creatures.forEach(([kind,y,size,duration,delay,reverse,opacity,emoji])=>{
+                const item=document.createElement('div');
+                item.className='sea-creature '+kind+(reverse?' reverse':'');
+                item.style.setProperty('--y',y);
+                item.style.setProperty('--size',size);
+                item.style.setProperty('--duration',duration);
+                item.style.setProperty('--delay',delay);
+                item.style.setProperty('--opacity',opacity);
+                item.innerHTML=kind==='dolphin'?dolphinSVG:emoji;
+                aquarium.appendChild(item);
+            });
+            for(let i=0;i<18;i++){
+                const bubble=document.createElement('span');bubble.className='air-bubble';
+                bubble.style.setProperty('--x',((i*37+11)%97)+'%');
+                bubble.style.setProperty('--r',(5+(i*7)%16)+'px');
+                bubble.style.setProperty('--duration',(12+(i*3)%17)+'s');
+                bubble.style.setProperty('--delay',(-i*2.7)+'s');
+                aquarium.appendChild(bubble);
+            }
+        })();
+
+        // JAVASCRIPT simplificado y ultra-compatible
+        let currentNumber = 1;
+        const maxNumber = 30;
+        
+        const bubble = document.getElementById('gameBubble');
+        const oceanArea = document.getElementById('oceanArea');
+        const victoryScreen = document.getElementById('victoryScreen');
+        const restartBtn = document.getElementById('restartBtn');
+
+        // Colores divertidos para que la burbuja cambie en cada clic
+        const colors = [
+            'radial-gradient(circle at 30% 30%, #ff9a9e, #fecfef)',
+            'radial-gradient(circle at 30% 30%, #a1c4fd, #c2e9fb)',
+            'radial-gradient(circle at 30% 30%, #84fab0, #8fd3f4)',
+            'radial-gradient(circle at 30% 30%, #fccb90, #d57eeb)',
+            'radial-gradient(circle at 30% 30%, #e0c3fc, #8ec5fc)',
+            'radial-gradient(circle at 30% 30%, #ffecd2, #fcb69f)'
+        ];
+
+        function moveBubble() {
+            // Conseguir el ancho y alto del mar azul
+            const areaWidth = oceanArea.clientWidth;
+            const areaHeight = oceanArea.clientHeight;
+
+            // Calcular posiciones aleatorias seguras
+            const randomX = Math.floor(Math.random() * (areaWidth - 90)) + 5;
+            const randomY = Math.floor(Math.random() * (areaHeight - 90)) + 5;
+            
+            // Aplicar coordenadas
+            bubble.style.left = randomX + 'px';
+            bubble.style.top = randomY + 'px';
+            
+            // Cambiar color
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            bubble.style.background = randomColor;
+        }
+
+        // Al hacer clic en la burbuja
+        bubble.addEventListener('click', function() {
+            if (currentNumber < maxNumber) {
+                currentNumber++;
+                bubble.textContent = currentNumber;
+                moveBubble();
+            } else {
+                // Pantalla de victoria al llegar a 30
+                bubble.style.display = 'none';
+                victoryScreen.style.display = 'flex';
+            }
+        });
+
+        restartBtn.addEventListener('click', function () {
+            currentNumber = 1;
+            bubble.textContent = '1';
+            bubble.style.display = 'flex';
+            victoryScreen.style.display = 'none';
+            moveBubble();
+        });
+        window.addEventListener('resize', moveBubble);
+        moveBubble();
+
+
+        // Ventana ampliada y tarjeta giratoria para cada dato.
+        const facts = [
+            ["¿Son peces?", "¡No son peces!", "Los delfines son mamíferos marinos. Respiran aire por un agujerito de la cabeza llamado espiráculo. Por eso suben a la superficie."],
+            ["¿Cómo duermen?", "Duermen con un ojo abierto", "Cuando descansan, una mitad de su cerebro permanece despierta. Así pueden salir a respirar y estar atentos a lo que ocurre alrededor."],
+            ["¿Viven en familia?", "Viven en grupos", "Los delfines nadan en grupos llamados manadas. Se cuidan, se acompañan y juegan juntos entre las olas."],
+            ["¿Cómo hablan?", "Se comunican con silbidos", "Utilizan silbidos y otros sonidos para comunicarse. Cada delfín puede tener un silbido característico que ayuda a identificarlo."]
+        ];
+        const factOverlay = document.getElementById('factOverlay');
+        const flipInner = document.getElementById('flipInner');
+        const flipFront = document.getElementById('flipFront');
+        const factTitle = document.getElementById('factTitle');
+        const factText = document.getElementById('factText');
+        let previousFocus = null;
+        document.querySelectorAll('.fact-tile').forEach(tile => {
+            tile.addEventListener('click', () => {
+                const index = Number(tile.dataset.fact);
+                previousFocus = document.activeElement;
+                flipInner.classList.remove('is-flipped');
+                flipFront.innerHTML = tile.querySelector('svg').outerHTML;
+                factTitle.textContent = facts[index][1];
+                factText.textContent = facts[index][2];
+                factOverlay.hidden = false;
+                document.body.style.overflow = 'hidden';
+                document.getElementById('factClose').focus();
+                requestAnimationFrame(() => setTimeout(() => flipInner.classList.add('is-flipped'), 500));
+            });
+        });
+        document.getElementById('flipStage').addEventListener('click', () => flipInner.classList.toggle('is-flipped'));
+        function closeFact(){ factOverlay.hidden=true; document.body.style.overflow=''; if(previousFocus)previousFocus.focus(); }
+        document.getElementById('factClose').addEventListener('click', closeFact);
+        factOverlay.addEventListener('click', e => {if(e.target===factOverlay)closeFact();});
+        document.addEventListener('keydown', e => {if(e.key==='Escape'&&!factOverlay.hidden)closeFact();});
+
+        // Reproductor local MP3, sin enlaces externos.
+        const musicBtn = document.getElementById('musicBtn');
+        const audio = document.getElementById('musicaLocal');
+        const volume = document.getElementById('musicVolume');
+        const status = document.getElementById('musicStatus');
+        audio.volume = Number(volume.value) / 100;
+        volume.addEventListener('input', () => { audio.volume = Number(volume.value) / 100; });
+        musicBtn.addEventListener('click', async () => {
+            if (!audio.paused) {
+                audio.pause();
+                musicBtn.textContent = '▶️ Activar música';
+                status.textContent = 'Música pausada.';
+                return;
+            }
+            try {
+                await audio.play();
+                musicBtn.textContent = '⏸️ Pausar música';
+                status.textContent = 'Reproduciendo musica.mp3 en bucle.';
+            } catch (error) {
+                status.textContent = 'No se ha podido reproducir. Comprueba que musica.mp3 esté en la misma carpeta y sea un MP3 válido.';
+            }
+        });
+        audio.addEventListener('error', () => {
+            status.textContent = 'No se encuentra musica.mp3 o el archivo no se puede reproducir. Comprueba el nombre y la carpeta.';
+        });
+        audio.addEventListener('ended', () => { musicBtn.textContent = '▶️ Activar música'; });
+
+        // Juego de letras: selección entre seis animales, con sus imágenes integradas.
+        const letterAnimals = [{"name":"DELFÍN","image":"imagenes/animal_1.webp"},{"name":"CANGREJO","image":"imagenes/animal_2.webp"},{"name":"TIBURÓN","image":"imagenes/animal_3.webp"},{"name":"CABALLITO DE MAR","image":"imagenes/animal_4.webp"},{"name":"PEZ ESPADA","image":"imagenes/animal_5.webp"},{"name":"ESTRELLA DE MAR","image":"imagenes/animal_6.webp"},{"name":"MANTA RAYA","image":"imagenes/animal_7.webp"}];
+        const picker = document.getElementById('letterAnimalPicker');
+        const selectedBox = document.getElementById('letterSelected');
+        const selectedImage = document.getElementById('letterSelectedImage');
+        const selectedTitle = document.getElementById('letterSelectedTitle');
+        const letterWord = document.getElementById('letterWord');
+        const letterOptions = document.getElementById('letterOptions');
+        const letterFeedback = document.getElementById('letterFeedback');
+        const letterReset = document.getElementById('letterReset');
+        const alphabet = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'.split('');
+        let chosenAnimal = null, wordLetters = [], hiddenIndex = -1, letterTimer = null, solved = false;
+        letterAnimals.forEach((animal, i) => {
+            const button = document.createElement('button');
+            button.className = 'letter-pick'; button.type = 'button';
+            const image = document.createElement('img'); image.src = animal.image; image.alt = animal.name;
+            const label = document.createElement('span'); label.textContent = animal.name;
+            button.append(image, label);
+            button.addEventListener('click', () => selectLetterAnimal(i));
+            picker.appendChild(button);
+        });
+        function selectLetterAnimal(i) {
+            chosenAnimal = letterAnimals[i]; hiddenIndex = -1;
+            picker.hidden = true; selectedBox.hidden = false;
+            letterWord.hidden = false; letterOptions.hidden = false; letterReset.hidden = false;
+            selectedImage.src = chosenAnimal.image; selectedImage.alt = chosenAnimal.name;
+            selectedTitle.textContent = '¿Qué letra falta?';
+            resetLetterGame();
+        }
+        function resetLetterGame() {
+            if (!chosenAnimal) return;
+            clearTimeout(letterTimer); solved = false;
+            letterFeedback.textContent = ''; letterFeedback.className = 'letter-feedback';
+            wordLetters = Array.from(chosenAnimal.name);
+            const possible = wordLetters.map((letter, i) => i).filter(i => wordLetters[i] !== ' ' && i !== hiddenIndex);
+            hiddenIndex = possible[Math.floor(Math.random() * possible.length)];
+            const answer = wordLetters[hiddenIndex];
+            letterWord.replaceChildren();
+            wordLetters.forEach((letter, index) => {
+                const span = document.createElement('span');
+                span.textContent = index === hiddenIndex ? '_' : letter;
+                if (index === hiddenIndex) { span.className = 'missing-letter'; span.id = 'missingLetter'; }
+                letterWord.appendChild(span);
+                if (index < wordLetters.length - 1) letterWord.appendChild(document.createTextNode(' '));
+            });
+            letterWord.setAttribute('aria-label', 'Nombre de animal marino con una letra oculta');
+            const normalize = c => c.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            const distractors = alphabet.filter(l => normalize(l) !== normalize(answer)).sort(() => Math.random() - .5).slice(0, 2);
+            const choices = [answer, ...distractors].sort(() => Math.random() - .5);
+            letterOptions.replaceChildren();
+            choices.forEach(letter => {
+                const button = document.createElement('button');
+                button.type = 'button'; button.className = 'letter-choice'; button.textContent = letter;
+                button.addEventListener('click', () => chooseLetter(letter));
+                letterOptions.appendChild(button);
+            });
+        }
+        function chooseLetter(letter) {
+            if (solved || !chosenAnimal) return;
+            clearTimeout(letterTimer);
+            const answer = wordLetters[hiddenIndex]; const correct = letter === answer;
+            letterFeedback.textContent = correct ? '🎉 ¡Muy bien! ¡Has encontrado la letra ' + answer + '!' : '🐬 ¡Vuelve a intentarlo!';
+            letterFeedback.className = 'letter-feedback ' + (correct ? 'correct' : 'incorrect');
+            if (correct) {
+                solved = true; document.getElementById('missingLetter').textContent = answer;
+                letterOptions.querySelectorAll('button').forEach(button => button.disabled = true);
+            }
+            letterTimer = setTimeout(() => { letterFeedback.textContent = ''; letterFeedback.className = 'letter-feedback'; }, 5000);
+        }
+        letterReset.addEventListener('click', resetLetterGame);
+        document.getElementById('letterBack').addEventListener('click', () => {
+            clearTimeout(letterTimer); chosenAnimal = null; picker.hidden = false;
+            selectedBox.hidden = true; letterWord.hidden = true; letterOptions.hidden = true; letterReset.hidden = true;
+            letterFeedback.textContent = '';
+        });
+        letterWord.hidden = true; letterOptions.hidden = true; letterReset.hidden = true;
+
+        // Tarjetas de animales: girar al pulsar, volver a girar al pulsar otra vez.
+        document.querySelectorAll('.animal-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const isFlipped = card.classList.toggle('flipped');
+                card.setAttribute('aria-pressed', String(isFlipped));
+            });
+        });
+        document.getElementById('animalReset').addEventListener('click', () => {
+            document.querySelectorAll('.animal-card').forEach(card => {
+                card.classList.remove('flipped');
+                card.setAttribute('aria-pressed', 'false');
+            });
+        });
+
+    </script>
+</body>
+</html>
